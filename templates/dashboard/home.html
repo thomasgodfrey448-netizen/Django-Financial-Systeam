@@ -1,0 +1,276 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Home Dashboard{% endblock %}
+
+{% block content %}
+<div class="page-wrapper">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="container-fluid">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h1 class="page-title"><i class="fas fa-home me-2"></i>Taarifa ya Fedha wiki Hii</h1>
+                    <p class="page-subtitle">Summary for <strong>{{ date_from|date:"M d, Y" }}</strong> to <strong>{{ date_to|date:"M d, Y" }}</strong></p>
+                </div>
+                <div class="col-auto">
+                    <button class="btn btn-filter-toggle" data-bs-toggle="collapse" data-bs-target="#filterPanel">
+                        <i class="fas fa-filter me-1"></i> Filter Dates
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Date Filter Panel -->
+    <div class="collapse {% if request.GET.date_from or request.GET.date_to or request.session.home_date_from or request.session.home_date_to %}show{% endif %}" id="filterPanel">
+        <div class="filter-panel">
+            <div class="container-fluid">
+                <form method="get" class="row g-3 align-items-end">
+                    <div class="col-sm-4 col-md-3">
+                        <label class="form-label fw-500">From Date</label>
+                        <input type="date" name="date_from" class="form-control" value="{{ date_from|date:'Y-m-d' }}">
+                    </div>
+                    <div class="col-sm-4 col-md-3">
+                        <label class="form-label fw-500">To Date</label>
+                        <input type="date" name="date_to" class="form-control" value="{{ date_to|date:'Y-m-d' }}">
+                    </div>
+                    <div class="col-sm-4 col-md-3">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-search me-1"></i> Apply Filter
+                        </button>
+                    </div>
+                    <div class="col-sm-4 col-md-3">
+                        <a href="{% url 'home' %}?reset=1" class="btn btn-outline-secondary w-100">
+                            <i class="fas fa-times me-1"></i> Reset
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid py-4">
+        <!-- Summary Cards -->
+        <div class="row g-4 mb-4">
+            <div class="col-6 col-md-3">
+                <div class="summary-card income-card">
+                    <div class="card-icon-wrap">
+                        <i class="fas fa-wallet"></i>
+                    </div>
+                    <div class="card-body-content">
+                        <p class="card-label">Matoleo</p>
+                        <h3 class="card-value tsh-value">{{ total_income|floatformat:2 }}</h3>
+                        <small class="card-currency">TSH</small>
+                    </div>
+                    <a href="{% url 'income' %}?date_from={{ date_from|date:'Y-m-d' }}&date_to={{ date_to|date:'Y-m-d' }}" class="card-link-overlay"></a>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="summary-card expense-card">
+                    <div class="card-icon-wrap">
+                        <i class="fas fa-file-invoice-dollar"></i>
+                    </div>
+                    <div class="card-body-content">
+                        <p class="card-label">Maombi ya Fedha</p>
+                        <h3 class="card-value tsh-value">{{ total_expenses|floatformat:2 }}</h3>
+                        <small class="card-currency">TSH</small>
+                    </div>
+                    <a href="{% url 'expenses' %}?date_from={{ date_from|date:'Y-m-d' }}&date_to={{ date_to|date:'Y-m-d' }}" class="card-link-overlay"></a>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="summary-card retirement-card">
+                    <div class="card-icon-wrap">
+                        <i class="fas fa-hand-holding-dollar"></i>
+                    </div>
+                    <div class="card-body-content">
+                        <p class="card-label">Marejesho</p>
+                        <h3 class="card-value tsh-value">{{ total_retirement|floatformat:2 }}</h3>
+                        <small class="card-currency">TSH</small>
+                    </div>
+                    <a href="{% url 'retirement' %}?date_from={{ date_from|date:'Y-m-d' }}&date_to={{ date_to|date:'Y-m-d' }}" class="card-link-overlay"></a>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="summary-card balance-card {% if net_balance >= 0 %}positive{% else %}negative{% endif %}">
+                    <div class="card-icon-wrap">
+                        <i class="fas fa-scale-balanced"></i>
+                    </div>
+                    <div class="card-body-content">
+                        <p class="card-label">Salio</p>
+                        <h3 class="card-value tsh-value">{{ net_balance|floatformat:2 }}</h3>
+                        <small class="card-currency">TSH</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <!-- Announcements -->
+            <div class="col-lg-6">
+                <div class="content-card">
+                    <div class="content-card-header">
+                        <h5><i class="fas fa-bullhorn me-2"></i>Matangazo kutoka Idara ya fedha</h5>
+                        {% if user.is_authenticated %}
+                            {% if user.profile.role == 'admin' or user.is_superuser %}
+                            <a href="{% url 'announcement_add' %}" class="btn btn-sm btn-add">
+                                <i class="fas fa-plus me-1"></i> Add
+                            </a>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                    <div class="content-card-body">
+                        {% if announcements %}
+                            {% for ann in announcements %}
+                            <div class="announcement-item">
+                                <div class="ann-icon"><i class="fas fa-megaphone"></i></div>
+                                <div class="ann-content">
+                                    <h6 class="ann-title">{{ ann.title }}</h6>
+                                    <p class="ann-text">{{ ann.content }}</p>
+                                    <small class="ann-date"><i class="fas fa-clock me-1"></i>{{ ann.created_at|date:"M d, Y" }}</small>
+                                </div>
+                                {% if user.is_authenticated %}
+                                    {% if user.profile.role == 'admin' or user.is_superuser %}
+                                    <div class="ann-actions">
+                                        <a href="{% url 'announcement_edit' ann.pk %}" class="btn-icon-sm edit"><i class="fas fa-edit"></i></a>
+                                        <form method="post" action="{% url 'announcement_delete' ann.pk %}" class="d-inline" onsubmit="return confirm('Delete this announcement?')">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn-icon-sm delete"><i class="fas fa-trash"></i></button>
+                                        </form>
+                                    </div>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="empty-state">
+                                <i class="fas fa-bullhorn"></i>
+                                <p>No announcements at this time.</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Comments Section -->
+            <div class="col-lg-6">
+                <div class="content-card">
+                    <div class="content-card-header">
+                        <h5><i class="fas fa-comments me-2"></i>Maoni na Ushauri</h5>
+                        <span class="badge-count">{{ comments|length }}</span>
+                    </div>
+                    <div class="content-card-body">
+                        <!-- Comment Form -->
+                        <div class="comment-form-wrap mb-3">
+                            <form method="post" action="{% url 'home' %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="submit_comment" value="1">
+                                <div class="row g-2">
+                                    <div class="col-6">
+                                        <input type="text" name="name" class="form-control form-control-sm" placeholder="Jina Lako *" required>
+                                    </div>
+                                    <div class="col-6">
+                                        <input type="email" name="email" class="form-control form-control-sm" placeholder="Email (Barua pepe)" required>
+                                    </div>
+                                    <div class="col-12">
+                                        <textarea name="message" class="form-control form-control-sm" rows="2" placeholder="Andika Ujumbe wako Hapa..." required></textarea>
+                                    </div>
+                                    <div class="col-12">
+                                        <button type="submit" class="btn btn-primary btn-sm w-100">
+                                            <i class="fas fa-paper-plane me-1"></i> Tuma Maoni Yako
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Comments List -->
+                        <div class="comments-list" style="max-height: 300px; overflow-y: auto;">
+                            {% if comments %}
+                                {% for comment in comments %}
+                                <div class="comment-item">
+                                    <div class="comment-avatar">{{ comment.name|first|upper }}</div>
+                                    <div class="comment-content">
+                                        <div class="comment-header">
+                                            <span class="comment-name">{{ comment.name }}</span>
+                                            <span class="comment-date">{{ comment.created_at|date:"M d, Y" }}</span>
+                                            {% if is_admin_user and comment.email %}
+                                            <a href="mailto:{{ comment.email }}?subject=Re:%20Your%20comment&body={{ comment.message|urlencode }}%0A%0A--%0AThanks%20from%20the%20team" class="comment-reply btn btn-sm btn-outline-primary ms-2">
+                                                <i class="fas fa-reply me-1"></i> Reply
+                                            </a>
+                                            {% endif %}
+                                        </div>
+                                        <p class="comment-text">{{ comment.message }}</p>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="empty-state">
+                                    <i class="fas fa-comment-slash"></i>
+                                    <p>No comments yet. Be the first!</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Description -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="content-card">
+                    <div class="content-card-header">
+                        <h5><i class="fas fa-info-circle me-2"></i>Taarifa Zaidi</h5>
+                    </div>
+                    <div class="content-card-body">
+                        <div class="row g-4">
+                            <div class="col-md-3">
+                                <div class="about-item">
+                                    <div class="about-icon income-bg"><i class="fas fa-arrow-trend-up"></i></div>
+                                    <h6>Matoleo</h6>
+                                    <p>Taarifa hii inaonyesha matoloe yote yaliokusanywa kwa wiki nzima, ikiwemo Zaka, Sadaka, MK na Matoleo mengine</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="about-item">
+                                    <div class="about-icon expense-bg"><i class="fas fa-file-invoice-dollar"></i></div>
+                                    <h6>Maombi ya Fedha</h6>
+                                    <p>Taarifa hii inahusisha maombi yote ya fedha yaliowasilishwa kwa wiki nzima, yaliopitishwa na ambayo bado hajapitishwa</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="about-item">
+                                    <div class="about-icon retirement-bg"><i class="fas fa-hand-holding-dollar"></i></div>
+                                    <h6>Marejesho</h6>
+                                    <p>Taarifa hii inaonyesha marejesho yaliofanyika na kukamilika na ambayo hajakamailika, kutoka katika idara za Kanisa</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="about-item">
+                                    <div class="about-icon balance-bg"><i class="fas fa-shield-halved"></i></div>
+                                    <h6>Watumiaji</h6>
+                                    <p>Taarifa hii ni kwa ajili ya Maofisa wa Kanisa la Waadventista Wasabato Makongo Juu, kutoka idara ya fedha</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Format TSH values
+document.querySelectorAll('.tsh-value').forEach(el => {
+    const raw = parseFloat(el.textContent.replace(/,/g, ''));
+    if (!isNaN(raw)) {
+        el.textContent = formatTSH(raw);
+    }
+});
+</script>
+{% endblock %}

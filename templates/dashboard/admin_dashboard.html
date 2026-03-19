@@ -1,0 +1,505 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Admin Panel{% endblock %}
+
+{% block content %}
+<div class="page-wrapper">
+    <div class="page-header admin-header">
+        <div class="container-fluid">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h1 class="page-title"><i class="fas fa-shield-halved me-2"></i>Admin Control Panel</h1>
+                    <p class="page-subtitle">Manage all financial data, users, and system settings</p>
+                </div>
+                <div class="col-auto d-flex gap-2">
+                    <button class="btn btn-filter-toggle" data-bs-toggle="collapse" data-bs-target="#adminFilterPanel">
+                        <i class="fas fa-filter me-1"></i> Filter
+                    </button>
+                    <span class="admin-badge"><i class="fas fa-crown me-1"></i>Administrator</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="collapse {% if request.GET.date_from or request.GET.date_to or request.session.admin_date_from or request.session.admin_date_to %}show{% endif %}" id="adminFilterPanel">
+        <div class="filter-panel">
+            <div class="container-fluid">
+                <form method="get" class="row g-3 align-items-end">
+                    <div class="col-sm-3">
+                        <label class="form-label fw-500">From Date</label>
+                        <input type="date" name="date_from" class="form-control" value="{{ date_from|date:'Y-m-d' }}">
+                    </div>
+                    <div class="col-sm-3">
+                        <label class="form-label fw-500">To Date</label>
+                        <input type="date" name="date_to" class="form-control" value="{{ date_to|date:'Y-m-d' }}">
+                    </div>
+                    <div class="col-sm-3 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary flex-fill">
+                            <i class="fas fa-search me-1"></i> Apply
+                        </button>
+                        <a href="{% url 'admin_dashboard' %}?reset=1" class="btn btn-outline-secondary flex-fill">
+                            <i class="fas fa-times"></i> Reset
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid py-4">
+        <!-- Overview Stats -->
+        <div class="row g-4 mb-4">
+            <div class="col-6 col-md-2">
+                <div class="admin-stat-card income-bg">
+                    <i class="fas fa-wallet"></i>
+                    <h4 class="tsh-value">{{ total_income|floatformat:2 }}</h4>
+                    <p>Total Income</p>
+                </div>
+            </div>
+            <div class="col-6 col-md-2">
+                <div class="admin-stat-card expense-bg">
+                    <i class="fas fa-file-invoice-dollar"></i>
+                    <h4 class="tsh-value">{{ total_expenses|floatformat:2 }}</h4>
+                    <p>Total Expense Requests</p>
+                </div>
+            </div>
+            <div class="col-6 col-md-2">
+                <div class="admin-stat-card retirement-bg">
+                    <i class="fas fa-hand-holding-dollar"></i>
+                    <h4 class="tsh-value">{{ total_retirement|floatformat:2 }}</h4>
+                    <p>Total Retirement</p>
+                </div>
+            </div>
+            <div class="col-6 col-md-2">
+                <div class="admin-stat-card balance-bg">
+                    <i class="fas fa-scale-balanced"></i>
+                    <h4 class="tsh-value">{{ net_balance|floatformat:2 }}</h4>
+                    <p>Balance</p>
+                </div>
+            </div>
+            <div class="col-6 col-md-2">
+                <div class="admin-stat-card users-bg">
+                    <i class="fas fa-users"></i>
+                    <h4>{{ total_users }}</h4>
+                    <p>Total Users</p>
+                </div>
+            </div>
+            <div class="col-6 col-md-2">
+                <div class="admin-stat-card pending-bg">
+                    <i class="fas fa-clock"></i>
+                    <h4>{{ pending_expenses }}</h4>
+                    <p>Pending Expense Requests</p>
+                </div>
+            </div>
+            <div class="col-6 col-md-2">
+                <div class="admin-stat-card ann-bg">
+                    <i class="fas fa-bullhorn"></i>
+                    <h4>{{ active_announcements }}</h4>
+                    <p>Announcements</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Tabs -->
+        <ul class="nav nav-tabs admin-tabs mb-4" id="adminTabs">
+            <li class="nav-item">
+                <a class="nav-link active" data-bs-toggle="tab" href="#tab-income">
+                    <i class="fas fa-arrow-trend-up me-1"></i> Income
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#tab-expenses">
+                    <i class="fas fa-file-invoice-dollar me-1"></i> Expenses requests
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#tab-retirement">
+                    <i class="fas fa-hand-holding-dollar me-1"></i> Retirement
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#tab-users">
+                    <i class="fas fa-users me-1"></i> Users
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#tab-announcements">
+                    <i class="fas fa-bullhorn me-1"></i> Announcements
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#tab-settings">
+                    <i class="fas fa-cog me-1"></i> Settings
+                </a>
+            </li>
+        </ul>
+
+        <div class="tab-content">
+            <!-- Income Tab -->
+            <div class="tab-pane fade show active" id="tab-income">
+                <div class="content-card">
+                    <div class="content-card-header">
+                        <h5><i class="fas fa-arrow-trend-up me-2"></i>Recent Income</h5>
+                        <div class="d-flex gap-2">
+                            <a href="{% url 'income_add' %}?next={% url 'admin_dashboard' %}" class="btn btn-sm btn-add">
+                                <i class="fas fa-plus me-1"></i> Add Income
+                            </a>
+                            <a href="{% url 'income' %}" class="btn btn-sm btn-outline-primary">View All</a>
+                        </div>
+                    </div>
+                    <div class="content-card-body p-0">
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr><th>Source</th><th>Amount (TSH)</th><th>Date</th><th>By</th><th>Actions</th></tr>
+                                </thead>
+                                <tbody>
+                                    {% for income in recent_income %}
+                                    <tr>
+                                        <td><span class="source-badge source-{{ income.source }}">{{ income.get_display_name }}</span></td>
+                                        <td class="amount-cell tsh-value">{{ income.amount|floatformat:2 }}</td>
+                                        <td>{{ income.date|date:"M d, Y" }}</td>
+                                        <td>{{ income.created_by.username|default:"-" }}</td>
+                                        <td class="action-cell">
+                                            <a href="{% url 'income_edit' income.pk %}" class="btn-action edit"><i class="fas fa-edit"></i></a>
+                                            <form method="post" action="{% url 'income_delete' income.pk %}" class="d-inline" onsubmit="return confirm('Delete?')">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn-action delete"><i class="fas fa-trash"></i></button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr><td colspan="5" class="text-center py-3 text-muted">No income records yet.</td></tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Expenses Tab -->
+            <div class="tab-pane fade" id="tab-expenses">
+                <div class="content-card">
+                    <div class="content-card-header">
+                        <h5><i class="fas fa-file-invoice-dollar me-2"></i>Recent Expense Requests</h5>
+                        <div class="d-flex gap-2">
+                            <a href="{% url 'expense_add' %}?next={% url 'admin_dashboard' %}" class="btn btn-sm btn-add">
+                                <i class="fas fa-plus me-1"></i> Add Request
+                            </a>
+                            <a href="{% url 'expenses' %}" class="btn btn-sm btn-outline-primary">View All</a>
+                        </div>
+                    </div>
+                    <div class="content-card-body p-0">
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr><th>Department</th><th>Category</th><th>Amount (TSH)</th><th>Status</th><th>Actions</th></tr>
+                                </thead>
+                                <tbody>
+                                    {% for expense in recent_expenses %}
+                                    <tr>
+                                        <td><span class="dept-badge">{{ expense.get_department_display }}</span></td>
+                                        <td>{{ expense.category }}</td>
+                                        <td class="amount-cell tsh-value">{{ expense.amount|floatformat:2 }}</td>
+                                        <td><span class="status-badge status-{{ expense.status }}">{{ expense.get_status_display }}</span></td>
+                                        <td class="action-cell">
+                                            <a href="{% url 'expense_edit' expense.pk %}" class="btn-action edit"><i class="fas fa-edit"></i></a>
+                                            <button class="btn-action status-btn" onclick="openStatusModal({{ expense.pk }}, '{{ expense.status }}')" data-bs-toggle="modal" data-bs-target="#statusModal">
+                                                <i class="fas fa-exchange-alt"></i>
+                                            </button>
+                                            <form method="post" action="{% url 'expense_delete' expense.pk %}" class="d-inline" onsubmit="return confirm('Delete?')">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn-action delete"><i class="fas fa-trash"></i></button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr><td colspan="5" class="text-center py-3 text-muted">No expense requests yet.</td></tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Retirement Tab -->
+            <div class="tab-pane fade" id="tab-retirement">
+                <div class="content-card">
+                    <div class="content-card-header">
+                        <h5><i class="fas fa-hand-holding-dollar me-2"></i>Recent Retirement Records</h5>
+                        <div class="d-flex gap-2">
+                            <a href="{% url 'retirement_add' %}?next={% url 'admin_dashboard' %}" class="btn btn-sm btn-add">
+                                <i class="fas fa-plus me-1"></i> Add Record
+                            </a>
+                            <a href="{% url 'retirement' %}" class="btn btn-sm btn-outline-primary">View All</a>
+                        </div>
+                    </div>
+                    <div class="content-card-body p-0">
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr><th>Department</th><th>Category</th><th>Amount (TSH)</th><th>Status</th><th>Actions</th></tr>
+                                </thead>
+                                <tbody>
+                                    {% for ret in recent_retirements %}
+                                    <tr>
+                                        <td><span class="dept-badge">{{ ret.get_department_display }}</span></td>
+                                        <td>{{ ret.category }}</td>
+                                        <td class="amount-cell tsh-value">{{ ret.amount|floatformat:2 }}</td>
+                                        <td><span class="status-badge status-ret-{{ ret.status }}">{{ ret.get_status_display }}</span></td>
+                                        <td class="action-cell">
+                                            <a href="{% url 'retirement_edit' ret.pk %}" class="btn-action edit"><i class="fas fa-edit"></i></a>
+                                            <form method="post" action="{% url 'retirement_delete' ret.pk %}" class="d-inline" onsubmit="return confirm('Delete?')">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn-action delete"><i class="fas fa-trash"></i></button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr><td colspan="5" class="text-center py-3 text-muted">No retirement records yet.</td></tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Users Tab -->
+            <div class="tab-pane fade" id="tab-users">
+                <div class="content-card">
+                    <div class="content-card-header">
+                        <h5><i class="fas fa-users me-2"></i>User Management</h5>
+                    </div>
+                    <div class="content-card-body p-0">
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr><th>Username</th><th>Full Name</th><th>Email</th><th>Role</th><th>Department</th><th>Actions</th></tr>
+                                </thead>
+                                <tbody>
+                                    {% for u in all_users %}
+                                    <tr>
+                                        <td><strong>{{ u.username }}</strong></td>
+                                        <td>{{ u.get_full_name|default:"-" }}</td>
+                                        <td>{{ u.email|default:"-" }}</td>
+                                        <td>
+                                            {% if u.is_superuser %}
+                                            <span class="status-badge status-approved">Super Admin</span>
+                                            {% else %}
+                                            <span class="status-badge {% if u.profile.role == 'admin' %}status-approved{% else %}status-pending{% endif %}">
+                                                {{ u.profile.get_role_display|default:"User" }}
+                                            </span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ u.profile.get_department_display|default:"-" }}</td>
+                                        <td class="action-cell">
+                                            <a href="{% url 'user_manage' u.pk %}" class="btn-action edit" title="Edit User"><i class="fas fa-edit"></i></a>
+                                        </td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr><td colspan="6" class="text-center py-3 text-muted">No users found.</td></tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Announcements Tab -->
+            <div class="tab-pane fade" id="tab-announcements">
+                <div class="content-card">
+                    <div class="content-card-header">
+                        <h5><i class="fas fa-bullhorn me-2"></i>Announcements</h5>
+                        <a href="{% url 'announcement_add' %}" class="btn btn-sm btn-add">
+                            <i class="fas fa-plus me-1"></i> New Announcement
+                        </a>
+                    </div>
+                    <div class="content-card-body">
+                        {% for ann in announcements %}
+                        <div class="announcement-item">
+                            <div class="ann-icon"><i class="fas fa-megaphone"></i></div>
+                            <div class="ann-content flex-fill">
+                                <h6 class="ann-title">{{ ann.title }}
+                                    {% if ann.is_active %}<span class="badge bg-success ms-2 small">Active</span>
+                                    {% else %}<span class="badge bg-secondary ms-2 small">Inactive</span>{% endif %}
+                                </h6>
+                                <p class="ann-text">{{ ann.content }}</p>
+                                <small class="ann-date">{{ ann.created_at|date:"M d, Y H:i" }}</small>
+                            </div>
+                            <div class="ann-actions">
+                                <a href="{% url 'announcement_edit' ann.pk %}" class="btn-icon-sm edit"><i class="fas fa-edit"></i></a>
+                                <form method="post" action="{% url 'announcement_delete' ann.pk %}" class="d-inline" onsubmit="return confirm('Delete?')">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn-icon-sm delete"><i class="fas fa-trash"></i></button>
+                                </form>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="empty-state">
+                            <i class="fas fa-bullhorn"></i>
+                            <p>No announcements yet.</p>
+                            <a href="{% url 'announcement_add' %}" class="btn btn-primary btn-sm">Create Announcement</a>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Comments Management -->
+                <div class="content-card mt-4">
+                    <div class="content-card-header">
+                        <h5><i class="fas fa-comments me-2"></i>User Comments</h5>
+                    </div>
+                    <div class="content-card-body p-0">
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr><th>Name</th><th>Email</th><th>Message</th><th>Date</th><th>Status</th></tr>
+                                </thead>
+                                <tbody>
+                                    {% for comment in comments %}
+                                    <tr>
+                                        <td>{{ comment.name }}</td>
+                                        <td>{{ comment.email|default:"-" }}</td>
+                                        <td>{{ comment.message|truncatechars:60 }}</td>
+                                        <td>{{ comment.created_at|date:"M d, Y" }}</td>
+                                        <td>
+                                            {% if comment.is_approved %}
+                                            <span class="status-badge status-approved">Approved</span>
+                                            {% else %}
+                                            <span class="status-badge status-not_approved">Hidden</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr><td colspan="5" class="text-center py-3 text-muted">No comments yet.</td></tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Tab -->
+            <div class="tab-pane fade" id="tab-settings">
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <div class="content-card">
+                            <div class="content-card-header">
+                                <h5><i class="fas fa-calendar-alt me-2"></i>Default Date Range</h5>
+                            </div>
+                            <div class="content-card-body">
+                                <p class="text-muted mb-3">Configure the default date range shown to all users on dashboards.</p>
+                                {% if default_range %}
+                                <div class="setting-info mb-3">
+                                    <span class="setting-label">Current Setting:</span>
+                                    <span class="setting-value">Last <strong>{{ default_range.days_back }}</strong> days</span>
+                                </div>
+                                {% endif %}
+                                <a href="{% url 'set_default_range' %}" class="btn btn-primary">
+                                    <i class="fas fa-edit me-1"></i> Change Default Range
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="content-card">
+                            <div class="content-card-header">
+                                <h5><i class="fas fa-scale-balanced me-2"></i>Balance</h5>
+                            </div>
+                            <div class="content-card-body">
+                                <p class="text-muted mb-3">Set the manual balance value shown on the home dashboard card.</p>
+                                <div class="setting-info mb-3">
+                                    <span class="setting-label">Current Balance:</span>
+                                    <span class="setting-value">TSH <strong>{{ net_balance|floatformat:2 }}</strong></span>
+                                </div>
+                                <a href="{% url 'set_net_balance' %}" class="btn btn-primary">
+                                    <i class="fas fa-edit me-1"></i> Update Balance
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="content-card">
+                            <div class="content-card-header">
+                                <h5><i class="fas fa-link me-2"></i>Quick Links</h5>
+                            </div>
+                            <div class="content-card-body">
+                                <div class="quick-links">
+                                    <a href="{% url 'income_add' %}" class="quick-link-item">
+                                        <i class="fas fa-plus-circle"></i> Add Income
+                                    </a>
+                                    <a href="{% url 'expense_add' %}" class="quick-link-item">
+                                        <i class="fas fa-plus-circle"></i> Add Expense Request
+                                    </a>
+                                    <a href="{% url 'retirement_add' %}" class="quick-link-item">
+                                        <i class="fas fa-plus-circle"></i> Add Retirement Record
+                                    </a>
+                                    <a href="{% url 'announcement_add' %}" class="quick-link-item">
+                                        <i class="fas fa-plus-circle"></i> New Announcement
+                                    </a>
+                                    <a href="/django-admin/" class="quick-link-item" target="_blank">
+                                        <i class="fas fa-database"></i> Django Admin
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Status Modal -->
+<div class="modal fade" id="statusModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-exchange-alt me-2"></i>Change Expense Request Status</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" id="statusForm" action="">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-500">New Status</label>
+                        <select name="status" id="statusSelect" class="form-select">
+                            <option value="pending">Pending</option>
+                            <option value="approved">Approved</option>
+                            <option value="not_approved">Not Approved</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-500">Review Notes</label>
+                        <textarea name="review_notes" class="form-control" rows="3" placeholder="Add review notes..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Update Status</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.querySelectorAll('.tsh-value').forEach(el => {
+    const raw = parseFloat(el.textContent.replace(/,/g, ''));
+    if (!isNaN(raw)) el.textContent = formatTSH(raw);
+});
+
+function openStatusModal(pk, currentStatus) {
+    document.getElementById('statusForm').action = `/expenses/${pk}/status/`;
+    document.getElementById('statusSelect').value = currentStatus;
+}
+</script>
+{% endblock %}

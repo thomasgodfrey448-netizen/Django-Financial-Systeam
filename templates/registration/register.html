@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Register{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+    <div class="auth-container" style="max-width: 560px;">
+        <div class="auth-card">
+            <div class="auth-header">
+                <div class="auth-logo">
+                    <i class="fas fa-user-plus"></i>
+                </div>
+                <h2>Create Account</h2>
+                <p>MKJ Finance Department Management System</p>
+            </div>
+
+            <div class="auth-body">
+                <form method="post" class="auth-form">
+                    {% csrf_token %}
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <label class="form-label fw-500">First Name</label>
+                            <input type="text" name="first_name" class="form-control" placeholder="First name" required>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label fw-500">Last Name</label>
+                            <input type="text" name="last_name" class="form-control" placeholder="Last name" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-500">Username</label>
+                            <input type="text" name="username" class="form-control" placeholder="Choose a username" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-500">Email Address</label>
+                            <input type="email" name="email" class="form-control" placeholder="your@email.com" required>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label fw-500">Phone Number</label>
+                            <input type="text" name="phone" class="form-control" placeholder="+255 xxx xxx xxx">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label fw-500">Password</label>
+                            <input type="password" name="password1" class="form-control" placeholder="Password" required>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label fw-500">Confirm Password</label>
+                            <input type="password" name="password2" class="form-control" placeholder="Confirm" required>
+                        </div>
+                    </div>
+
+                    {% if form.errors %}
+                    <div class="alert alert-danger mt-3">
+                        {% for field in form %}
+                            {% for error in field.errors %}
+                            <div><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</div>
+                            {% endfor %}
+                        {% endfor %}
+                        {% for error in form.non_field_errors %}
+                        <div><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <button type="submit" class="btn btn-primary btn-lg w-100 mt-4 mb-3">
+                        <i class="fas fa-user-plus me-2"></i> Create Account
+                    </button>
+                </form>
+
+                <div class="auth-divider">
+                    <span>Already have an account?</span>
+                </div>
+                <a href="{% url 'login' %}" class="btn btn-outline-primary w-100">
+                    <i class="fas fa-sign-in-alt me-2"></i> Sign In
+                </a>
+            </div>
+
+            <div class="auth-footer">
+                <a href="{% url 'home' %}"><i class="fas fa-arrow-left me-1"></i> Back to Dashboard</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

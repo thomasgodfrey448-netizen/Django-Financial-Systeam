@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block title %}{{ action }} Announcement{% endblock %}
+
+{% block content %}
+<div class="page-wrapper">
+    <div class="page-header">
+        <div class="container-fluid">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h1 class="page-title"><i class="fas fa-bullhorn me-2"></i>{{ action }} Announcement</h1>
+                </div>
+                <div class="col-auto">
+                    <a href="{% url 'admin_dashboard' %}" class="btn btn-outline-light">
+                        <i class="fas fa-arrow-left me-1"></i> Back
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container-fluid py-4">
+        <div class="row justify-content-center">
+            <div class="col-lg-7">
+                <div class="form-card">
+                    <div class="form-card-header"><i class="fas fa-bullhorn me-2"></i>{{ action }} Announcement</div>
+                    <div class="form-card-body">
+                        <form method="post">
+                            {% csrf_token %}
+                            <div class="mb-4">
+                                <label class="form-label fw-500">Title <span class="text-danger">*</span></label>
+                                <input type="text" name="title" class="form-control form-control-lg"
+                                       value="{{ form.title.value|default:'' }}" placeholder="Announcement title" required>
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label fw-500">Content <span class="text-danger">*</span></label>
+                                <textarea name="content" class="form-control" rows="5"
+                                          placeholder="Announcement content..." required>{{ form.content.value|default:'' }}</textarea>
+                            </div>
+                            <div class="mb-4 form-check">
+                                <input type="checkbox" name="is_active" class="form-check-input" id="isActive"
+                                       {% if form.is_active.value != False %}checked{% endif %}>
+                                <label class="form-check-label fw-500" for="isActive">Active (visible to all users)</label>
+                            </div>
+                            <div class="d-flex gap-3">
+                                <button type="submit" class="btn btn-primary btn-lg flex-fill">
+                                    <i class="fas fa-save me-2"></i> Save Announcement
+                                </button>
+                                <a href="{% url 'admin_dashboard' %}" class="btn btn-outline-secondary btn-lg">Cancel</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

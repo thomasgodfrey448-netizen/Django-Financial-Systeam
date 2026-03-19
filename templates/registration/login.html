@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <div class="auth-logo">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h2>Welcome</h2>
+                <p>Sign in to account</p>
+            </div>
+
+            <div class="auth-body">
+                <form method="post" class="auth-form">
+                    {% csrf_token %}
+                    <div class="mb-4">
+                        <label class="form-label fw-500">
+                            <i class="fas fa-user me-1 text-primary"></i> Username
+                        </label>
+                        <input type="text" name="username" class="form-control form-control-lg"
+                               placeholder="Enter your username" required autofocus>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label fw-500">
+                            <i class="fas fa-lock me-1 text-primary"></i> Password
+                        </label>
+                        <div class="input-group">
+                            <input type="password" name="password" id="passwordField"
+                                   class="form-control form-control-lg" placeholder="Enter your password" required>
+                            <button type="button" class="btn btn-outline-secondary" onclick="togglePassword()">
+                                <i class="fas fa-eye" id="eyeIcon"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-lg w-100 mb-3">
+                        <i class="fas fa-sign-in-alt me-2"></i> Sign In
+                    </button>
+                </form>
+
+                <div class="auth-divider">
+                    <span>Don't have an account?</span>
+                </div>
+                <a href="{% url 'register' %}" class="btn btn-outline-primary w-100">
+                    <i class="fas fa-user-plus me-2"></i> Create Account
+                </a>
+            </div>
+
+            <div class="auth-footer">
+                <a href="{% url 'home' %}"><i class="fas fa-arrow-left me-1"></i> Back to Dashboard</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function togglePassword() {
+    const field = document.getElementById('passwordField');
+    const icon = document.getElementById('eyeIcon');
+    if (field.type === 'password') {
+        field.type = 'text';
+        icon.classList.replace('fa-eye', 'fa-eye-slash');
+    } else {
+        field.type = 'password';
+        icon.classList.replace('fa-eye-slash', 'fa-eye');
+    }
+}
+</script>
+{% endblock %}

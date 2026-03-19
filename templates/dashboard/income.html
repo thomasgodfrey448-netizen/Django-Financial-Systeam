@@ -1,0 +1,240 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Income Dashboard{% endblock %}
+
+{% block content %}
+<div class="page-wrapper">
+    <div class="page-header">
+        <div class="container-fluid">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h1 class="page-title"><i class="fas fa-arrow-trend-up me-2"></i>Taarifa ya Matoleo</h1>
+                    <p class="page-subtitle">Kuanzia: <strong>{{ date_from|date:"M d, Y" }}</strong> hadi <strong>{{ date_to|date:"M d, Y" }}</strong></p>
+                </div>
+                <div class="col-auto d-flex gap-2">
+                    <button class="btn btn-filter-toggle" data-bs-toggle="collapse" data-bs-target="#filterPanel">
+                        <i class="fas fa-filter me-1"></i> Filter
+                    </button>
+                    {% if user.is_authenticated %}
+                    <a href="{% url 'income_add' %}" class="btn btn-add-main">
+                        <i class="fas fa-plus me-1"></i> Ongeza Matoleo
+                    </a>
+                    {% else %}
+                    <a href="{% url 'login' %}" class="btn btn-add-main">
+                        <i class="fas fa-lock me-1"></i> Login to Add
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Panel -->
+    <div class="collapse {% if request.GET.date_from or request.GET.date_to or request.GET.department or request.session.income_date_from or request.session.income_date_to or request.session.income_department %}show{% endif %}" id="filterPanel">
+        <div class="filter-panel">
+            <div class="container-fluid">
+                <form method="get" class="row g-3 align-items-end">
+                    <div class="col-sm-3">
+                        <label class="form-label fw-500">From Date</label>
+                        <input type="date" name="date_from" class="form-control" value="{{ date_from|date:'Y-m-d' }}">
+                    </div>
+                    <div class="col-sm-3">
+                        <label class="form-label fw-500">To Date</label>
+                        <input type="date" name="date_to" class="form-control" value="{{ date_to|date:'Y-m-d' }}">
+                    </div>
+                    <div class="col-sm-3">
+                        <label class="form-label fw-500">Matoleo</label>
+                        <select name="source" class="form-select">
+                            <option value="">All Sources</option>
+                            <option value="zaka" {% if source == 'zaka' %}selected{% endif %}>Zaka</option>
+                            <option value="sadaka" {% if source == 'sadaka' %}selected{% endif %}>Sadaka</option>
+                            <option value="mk" {% if source == 'mk' %}selected{% endif %}>MK</option>
+                            <option value="other" {% if source == 'other' %}selected{% endif %}>Other</option>
+                        </select>
+                    </div>
+                    <div class="col-sm-3">
+                        <label class="form-label fw-500">Idara</label>
+                        <select name="department" class="form-select">
+                            <option value="">Idara zote</option>
+                            <option value="administration" {% if department == 'administration' %}selected{% endif %}>Ofisi Ya Mchungaji</option>
+                            <option value="finance" {% if department == 'finance' %}selected{% endif %}>Fedha</option>
+                            <option value="education" {% if department == 'education' %}selected{% endif %}>Newstart</option>
+                            <option value="health" {% if department == 'health' %}selected{% endif %}>Afya</option>
+                            <option value="welfare" {% if department == 'welfare' %}selected{% endif %}>Huduma Binafsi</option>
+                            <option value="youth" {% if department == 'youth' %}selected{% endif %}>vijana</option>
+                            <option value="women" {% if department == 'women' %}selected{% endif %}>Idaya ya wana wa kike</option>
+                            <option value="security" {% if department == 'security' %}selected{% endif %}>uwakili</option>
+                            <option value="infrastructure" {% if department == 'infrastructure' %}selected{% endif %}>Majengo</option>
+                            <option value="communications" {% if department == 'communications' %}selected{% endif %}>Mawasiliano</option>
+                            <option value="atape" {% if department == 'atape' %}selected{% endif %}>Atape</option>
+                            <option value="ss" {% if department == 'ss' %}selected{% endif %}>SS</option>
+                            <option value="newstart" {% if department == 'newstart' %}selected{% endif %}>New Start</option>
+                            <option value="familia" {% if department == 'familia' %}selected{% endif %}>Huduma za Familia</option>
+                            <option value="vbs" {% if department == 'vbs' %}selected{% endif %}>VBS</option>
+                            <option value="muziki" {% if department == 'muziki' %}selected{% endif %}>Muziki</option>
+                            <option value="maombi" {% if department == 'maombi' %}selected{% endif %}>Maombi</option>
+                            <option value="vop" {% if department == 'vop' %}selected{% endif %}>VOP</option>
+                            <option value="fedha" {% if department == 'fedha' %}selected{% endif %}>Fedha</option>
+                            <option value="watoto" {% if department == 'watoto' %}selected{% endif %}>Watoto</option>
+                            <option value="uchapaji" {% if department == 'uchapaji' %}selected{% endif %}>Uchapaji</option>
+                            <option value="mahitaji" {% if department == 'mahitaji' %}selected{% endif %}>Mahitaji Maalumu</option>
+                            <option value="amo&dorcas" {% if department == 'amo&dorcas' %}selected{% endif %}>AMO & Dorcas</option>
+                            <option value="kwaya" {% if department == 'kwaya' %}selected{% endif %}>Kwaya ya Kanisa</option>
+                            <option value="syc" {% if department == 'syc' %}selected{% endif %}>SYC</option>
+                            <option value="shadow" {% if department == 'shadow' %}selected{% endif %}>Shadow of Calvary</option>
+                        </select>
+                    </div>
+                    <div class="col-sm-3 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary flex-fill">
+                            <i class="fas fa-search me-1"></i> Apply
+                        </button>
+                        <a href="{% url 'income' %}?reset=1" class="btn btn-outline-secondary flex-fill">
+                            <i class="fas fa-times"></i> Reset
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid py-4">
+        <!-- Summary Cards -->
+        <div class="row g-4 mb-4">
+            <div class="col-6 col-md-3">
+                <div class="summary-card zaka-card">
+                    <div class="card-icon-wrap"><i class="fas fa-hand-holding-heart"></i></div>
+                    <div class="card-body-content">
+                        <p class="card-label">Jumla ya Zaka</p>
+                        <h3 class="card-value tsh-value">{{ total_zaka|floatformat:2 }}</h3>
+                        <small class="card-currency">TSH</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="summary-card sadaka-card">
+                    <div class="card-icon-wrap"><i class="fas fa-donate"></i></div>
+                    <div class="card-body-content">
+                        <p class="card-label">Jumla ya Sadaka</p>
+                        <h3 class="card-value tsh-value">{{ total_sadaka|floatformat:2 }}</h3>
+                        <small class="card-currency">TSH</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="summary-card mk-card">
+                    <div class="card-icon-wrap"><i class="fas fa-coins"></i></div>
+                    <div class="card-body-content">
+                        <p class="card-label">Jumla ya MK</p>
+                        <h3 class="card-value tsh-value">{{ total_mk|floatformat:2 }}</h3>
+                        <small class="card-currency">TSH</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="summary-card income-card">
+                    <div class="card-icon-wrap"><i class="fas fa-arrow-trend-up"></i></div>
+                    <div class="card-body-content">
+                        <p class="card-label">Jumla ya Matoleo</p>
+                        <h3 class="card-value tsh-value">{{ total_income|floatformat:2 }}</h3>
+                        <small class="card-currency">TSH</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Income Table -->
+        <div class="content-card">
+            <div class="content-card-header">
+                <h5><i class="fas fa-table me-2"></i>Rekodi ya Matoleo</h5>
+                <div class="d-flex gap-2 align-items-center">
+                    <span class="badge-count">{{ incomes|length }} records</span>
+                </div>
+            </div>
+            <div class="content-card-body p-0">
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Matoleo</th>
+                                <th>Kiasi (TSH)</th>
+                                <th>Tarehe</th>
+                                {% if user.is_authenticated and user.profile.role != 'customer' %}
+                                <th class="text-center">Actions</th>
+                                {% endif %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for income in incomes %}
+                            <tr class="table-row-clickable">
+                                <td>{{ income.get_display_name }}</td>
+                                <td class="amount-cell tsh-value">{{ income.amount|floatformat:2 }}</td>
+                                <td>{{ income.date|date:"M d, Y" }}</td>
+                                {% if user.is_authenticated and user.profile.role != 'customer' %}
+                                <td class="text-center">
+                                    <a href="{% url 'income_edit' income.pk %}" class="btn btn-sm btn-outline-secondary me-1">Edit</a>
+                                    <form method="post" action="{% url 'income_delete' income.pk %}" class="d-inline" onsubmit="return confirm('Delete this income?');">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                                    </form>
+                                </td>
+                                {% endif %}
+                            </tr>
+                            <tr class="details-row d-none">
+                                <td colspan="{% if user.is_authenticated and user.profile.role != 'customer' %}4{% else %}3{% endif %}" class="details-cell">
+                                    <div class="details-content">
+                                        <strong>Mchanganuo:</strong>
+                                        <span>{{ income.description|default:"(Hakuna mchanganuo)" }}</span>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="{% if user.is_authenticated and user.profile.role != 'customer' %}4{% else %}3{% endif %}">
+                                    <div class="empty-state">
+                                        <i class="fas fa-inbox"></i>
+                                        <p>Hakuna rekodi ya matoleo zilizopatikana kwa kipindi hiki.</p>
+                                        {% if user.is_authenticated and user.profile.role != 'customer' %}
+                                        <a href="{% url 'income_add' %}" class="btn btn-primary btn-sm">Add Income</a>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        {% if incomes %}
+                        <tfoot>
+                            {% if user.is_authenticated and user.profile.role != 'customer' %}
+                            <tr class="table-total-row">
+                                <td><strong>JUMLA YA MATOLEO YOTE</strong></td>
+                                <td class="amount-cell tsh-value"><strong>{{ total_income|floatformat:2 }}</strong></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            {% else %}
+                            <tr class="table-total-row">
+                                <td><strong>JUMLA YA MATOLEO YOTE</strong></td>
+                                <td class="amount-cell tsh-value"><strong>{{ total_income|floatformat:2 }}</strong></td>
+                                <td></td>
+                            </tr>
+                            {% endif %}
+                        </tfoot>
+                        {% endif %}
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.querySelectorAll('.tsh-value').forEach(el => {
+    const raw = parseFloat(el.textContent.replace(/,/g, ''));
+    if (!isNaN(raw)) el.textContent = formatTSH(raw);
+});
+
+// Income rows no longer navigate to detail page
+</script>
+{% endblock %}

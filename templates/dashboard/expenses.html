@@ -1,0 +1,279 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Taarifa ya Maombi ya Fedha{% endblock %}
+
+{% block content %}
+<div class="page-wrapper">
+    <div class="page-header">
+        <div class="container-fluid">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h1 class="page-title"><i class="fas fa-file-invoice-dollar me-2"></i>Maombi ya Fedha</h1>
+                    <p class="page-subtitle">Period: <strong>{{ date_from|date:"M d, Y" }}</strong> to <strong>{{ date_to|date:"M d, Y" }}</strong></p>
+                </div>
+                <div class="col-auto d-flex gap-2">
+                    <button class="btn btn-filter-toggle" data-bs-toggle="collapse" data-bs-target="#filterPanel">
+                        <i class="fas fa-filter me-1"></i> Filter
+                    </button>
+                    {% if user.is_authenticated %}
+                    <a href="{% url 'expense_add' %}" class="btn btn-add-main">
+                        <i class="fas fa-plus me-1"></i> New Request
+                    </a>
+                    {% else %}
+                    <a href="{% url 'login' %}" class="btn btn-add-main">
+                        <i class="fas fa-lock me-1"></i> Login to Add
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Panel -->
+    <div class="collapse {% if request.GET.date_from or request.GET.date_to or request.GET.department or request.GET.status or request.session.expenses_date_from or request.session.expenses_date_to or request.session.expenses_department or request.session.expenses_status %}show{% endif %}" id="filterPanel">
+        <div class="filter-panel">
+            <div class="container-fluid">
+                <form method="get" class="row g-3 align-items-end">
+                    <div class="col-sm-2">
+                        <label class="form-label fw-500">From Date</label>
+                        <input type="date" name="date_from" class="form-control" value="{{ date_from|date:'Y-m-d' }}">
+                    </div>
+                    <div class="col-sm-2">
+                        <label class="form-label fw-500">To Date</label>
+                        <input type="date" name="date_to" class="form-control" value="{{ date_to|date:'Y-m-d' }}">
+                    </div>
+                    <div class="col-sm-3">
+                        <label class="form-label fw-500">Idara</label>
+                        <select name="department" class="form-select">
+                            <option value="">Idara zote</option>
+                            <option value="OfisiMchungaji" {% if form.department.value == 'Ofisi Ya Mchungaji' %}selected{% endif %}>Ofisi Ya Mchungaji</option>
+                            <option value="fedha" {% if form.department.value == 'Fedha' %}selected{% endif %}>Fedha</option>
+                            <option value="elimu" {% if form.department.value == 'Elimu' %}selected{% endif %}>Elimu</option>
+                            <option value="afya" {% if form.department.value == 'Afya' %}selected{% endif %}>Afya</option>
+                            <option value="huduma" {% if form.department.value == 'Huduma Binafsi' %}selected{% endif %}>Huduma Binafsi</option>
+                            <option value="vijana" {% if form.department.value == 'Vijana' %}selected{% endif %}>Vijana</option>
+                            <option value="wanawake" {% if form.department.value == 'Wana wa kike' %}selected{% endif %}>Wana wa Kike</option>
+                            <option value="uwakili" {% if form.department.value == 'Uwakili' %}selected{% endif %}>Uwakili</option>
+                            <option value="majengo" {% if form.department.value == 'Majengo' %}selected{% endif %}>Majengo</option>
+                            <option value="newstart" {% if form.department.value == 'New Start' %}selected{% endif %}>New Start</option>
+                            <option value="mawasiliano" {% if form.department.value == 'Mawasiliano' %}selected{% endif %}>Mawasiliano</option>
+                            <option value="vbs" {% if form.department.value == 'VBS' %}selected{% endif %}>VBS</option>
+                            <option value="ss" {% if form.department.value == 'SS' %}selected{% endif %}>SS</option>
+                            <option value="amr" {% if form.department.value == 'AMR' %}selected{% endif %}>AMR</option>
+                            <option value="muziki" {% if form.department.value == 'Muziki' %}selected{% endif %}>Muziki</option>
+                            <option value="maombi" {% if form.department.value == 'Maombi' %}selected{% endif %}>Maombi</option>
+                            <option value="atape" {% if form.department.value == 'Atape' %}selected{% endif %}>Atape</option>
+                            <option value="familia" {% if form.department.value == 'Familia' %}selected{% endif %}>Huduma za Familia</option>
+                            <option value="vop" {% if form.department.value == 'VOP' %}selected{% endif %}>VOP</option>
+                            <option value="nyingineyo" {% if form.department.value == 'Nyingineyo' %}selected{% endif %}>Nyingineyo</option>
+                            <option value="watoto" {% if form.department.value == 'Watoto' %}selected{% endif %}>Watoto</option>
+                            <option value="uchapaji" {% if form.department.value == 'Uchapaji' %}selected{% endif %}>Uchapaji</option>
+                            <option value="mahitaji" {% if form.department.value == 'Mahitaji Maalumu' %}selected{% endif %}>Mahitaji Maalumu</option>
+                            <option value="amo&dorcas" {% if form.department.value == 'AMO & Dorcas' %}selected{% endif %}>AMO & Dorcas</option>
+                            <option value="kwaya" {% if form.department.value == 'Kwaya ya Kanisa' %}selected{% endif %}>Kwaya ya Kanisa</option>
+                            <option value="syc" {% if form.department.value == 'SYC' %}selected{% endif %}>SYC</option>
+                            <option value="shadow" {% if form.department.value == 'Shadow of Calvary' %}selected{% endif %}>Shadow of Calvary</option>
+                            <option value="mashemasi" {% if form.department.value == 'Mashemasi' %}selected{% endif %}>Mashemasi</option>
+                        </select>
+                    </div>
+                    <div class="col-sm-2">
+                        <label class="form-label fw-500">Status</label>
+                        <select name="status" class="form-select">
+                            <option value="">All Status</option>
+                            <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>Pending</option>
+                            <option value="approved" {% if status_filter == 'approved' %}selected{% endif %}>Approved</option>
+                            <option value="not_approved" {% if status_filter == 'not_approved' %}selected{% endif %}>Not Approved</option>
+                        </select>
+                    </div>
+                    <div class="col-sm-3 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary flex-fill">
+                            <i class="fas fa-search me-1"></i> Apply
+                        </button>
+                        <a href="{% url 'expenses' %}?reset=1" class="btn btn-outline-secondary flex-fill">
+                            <i class="fas fa-times"></i> Reset
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid py-4">
+        <!-- Summary Cards -->
+        <div class="row g-4 mb-4">
+            <div class="col-6 col-md-3">
+                <div class="summary-card expense-card">
+                    <div class="card-icon-wrap"><i class="fas fa-file-invoice-dollar"></i></div>
+                    <div class="card-body-content">
+                        <p class="card-label">Maombi yote ya Fedha</p>
+                        <h3 class="card-value tsh-value">{{ total_requests|floatformat:2 }}</h3>
+                        <small class="card-currency">TSH &bull; {{ count_total }} items</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="summary-card approved-card">
+                    <div class="card-icon-wrap"><i class="fas fa-check-circle"></i></div>
+                    <div class="card-body-content">
+                        <p class="card-label">Yaliyo Idhinishwa</p>
+                        <h3 class="card-value tsh-value">{{ total_approved|floatformat:2 }}</h3>
+                        <small class="card-currency">TSH &bull; {{ count_approved }} items</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="summary-card rejected-card">
+                    <div class="card-icon-wrap"><i class="fas fa-times-circle"></i></div>
+                    <div class="card-body-content">
+                        <p class="card-label">Yasiyo Idhinishwa</p>
+                        <h3 class="card-value tsh-value">{{ total_not_approved|floatformat:2 }}</h3>
+                        <small class="card-currency">TSH &bull; {{ count_not_approved }} items</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="summary-card pending-card">
+                    <div class="card-icon-wrap"><i class="fas fa-clock"></i></div>
+                    <div class="card-body-content">
+                        <p class="card-label">Yanayo Subiri</p>
+                        <h3 class="card-value tsh-value">{{ total_pending|floatformat:2 }}</h3>
+                        <small class="card-currency">TSH &bull; {{ count_pending }} items</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status Filter Tabs -->
+        <div class="status-tabs mb-3">
+            <a href="?date_from={{ date_from|date:'Y-m-d' }}&date_to={{ date_to|date:'Y-m-d' }}{% if department %}&department={{ department }}{% endif %}"
+               class="status-tab {% if not status_filter %}active{% endif %}">All</a>
+            <a href="?date_from={{ date_from|date:'Y-m-d' }}&date_to={{ date_to|date:'Y-m-d' }}&status=pending{% if department %}&department={{ department }}{% endif %}"
+               class="status-tab pending {% if status_filter == 'pending' %}active{% endif %}">
+               <i class="fas fa-clock me-1"></i>Pending</a>
+            <a href="?date_from={{ date_from|date:'Y-m-d' }}&date_to={{ date_to|date:'Y-m-d' }}&status=approved{% if department %}&department={{ department }}{% endif %}"
+               class="status-tab approved {% if status_filter == 'approved' %}active{% endif %}">
+               <i class="fas fa-check me-1"></i>Approved</a>
+            <a href="?date_from={{ date_from|date:'Y-m-d' }}&date_to={{ date_to|date:'Y-m-d' }}&status=not_approved{% if department %}&department={{ department }}{% endif %}"
+               class="status-tab rejected {% if status_filter == 'not_approved' %}active{% endif %}">
+               <i class="fas fa-times me-1"></i>Not Approved</a>
+        </div>
+
+        <!-- Expenses Table -->
+        <div class="content-card">
+            <div class="content-card-header">
+                <h5><i class="fas fa-table me-2"></i>Maombi ya Fedha</h5>
+                <span class="badge-count">{{ expenses|length }} records</span>
+            </div>
+            <div class="content-card-body p-0">
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Idara</th>
+                                <th>Kwa ajili ya</th>
+                                <th>Kiasi (TSH)</th>
+                                <th>Tarehe</th>
+                                <th>Status</th>
+                                {% if user.is_authenticated and user.profile.role != 'customer' %}
+                                <th class="text-center">Actions</th>
+                                {% endif %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for expense in expenses %}
+                            <tr class="table-row-clickable">
+                                <td>{{ forloop.counter }}</td>
+                                <td>
+                                    <span class="dept-badge">{{ expense.get_department_display }}</span>
+                                </td>
+                                <td>{{ expense.category }}</td>
+                                <td class="amount-cell tsh-value">{{ expense.amount|floatformat:2 }}</td>
+                                <td>{{ expense.date|date:"M d, Y" }}</td>
+                                <td>
+                                    <span class="status-badge status-{{ expense.status }}">
+                                        {% if expense.status == 'approved' %}Approved
+                                        {% elif expense.status == 'not_approved' %}Not Approved
+                                        {% else %}Pending{% endif %}
+                                    </span>
+                                </td>
+                                {% if user.is_authenticated and user.profile.role != 'customer' %}
+                                <td class="text-center">
+                                    <a href="{% url 'expense_edit' expense.pk %}" class="btn btn-sm btn-outline-secondary me-1">Edit</a>
+                                    <form method="post" action="{% url 'expense_delete' expense.pk %}" class="d-inline" onsubmit="return confirm('Delete this request?');">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                                    </form>
+                                </td>
+                                {% endif %}
+                            </tr>
+                            <tr class="details-row d-none">
+                                <td colspan="{% if user.is_authenticated and user.profile.role != 'customer' %}7{% else %}6{% endif %}" class="details-cell">
+                                    <div class="details-content">
+                                        <strong>Mchanganuo:</strong>
+                                        <span>{{ expense.description|default:"(Hakuna mchanganuo)" }}</span>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="{% if user.is_authenticated and user.profile.role != 'customer' %}7{% else %}6{% endif %}">
+                                    <div class="empty-state">
+                                        <i class="fas fa-inbox"></i>
+                                        <p>Hakuna maombi ya fedha yaliyopatikana kwa kipindi hiki.</p>
+                                        {% if user.is_authenticated and user.profile.role != 'customer' %}
+                                        <a href="{% url 'expense_add' %}" class="btn btn-primary btn-sm">Submit Request</a>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        {% if expenses %}
+                        <tfoot>
+                            {% if user.is_authenticated and user.profile.role != 'customer' %}
+                            <tr class="table-total-row">
+                                <td colspan="3"><strong>JUMLA YA MAOMBI YOTE YA FEDHA</strong></td>
+                                <td class="amount-cell tsh-value"><strong>{{ total_requests|floatformat:2 }}</strong></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            {% else %}
+                            <tr class="table-total-row">
+                                <td colspan="3"><strong>JUMLA YA MAOMBI YOTE YA FEDHA</strong></td>
+                                <td class="amount-cell tsh-value"><strong>{{ total_requests|floatformat:2 }}</strong></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            {% endif %}
+                        </tfoot>
+                        {% endif %}
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.querySelectorAll('.tsh-value').forEach(el => {
+    const raw = parseFloat(el.textContent.replace(/,/g, ''));
+    if (!isNaN(raw)) el.textContent = formatTSH(raw);
+});
+
+document.querySelectorAll('.table-row-clickable').forEach(row => {
+    row.addEventListener('click', function(e) {
+        if (e.target.closest('a') || e.target.closest('button')) return;
+        const detailsRow = this.nextElementSibling;
+        if (detailsRow && detailsRow.classList.contains('details-row')) {
+            detailsRow.classList.toggle('d-none');
+        }
+    });
+});
+</script>
+{% endblock %}

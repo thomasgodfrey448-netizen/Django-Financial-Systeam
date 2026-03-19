@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ action }} Expense Request{% endblock %}
+
+{% block content %}
+<div class="page-wrapper">
+    <div class="page-header">
+        <div class="container-fluid">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h1 class="page-title">
+                        <i class="fas fa-{% if action == 'Add' %}plus-circle{% else %}edit{% endif %} me-2"></i>
+                        {{ action }} Expense Request
+                    </h1>
+                </div>
+                <div class="col-auto">
+                    <a href="{% url 'expenses' %}" class="btn btn-outline-light">
+                        <i class="fas fa-arrow-left me-1"></i> Back
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid py-4">
+        <div class="row justify-content-center">
+            <div class="col-lg-7">
+                <div class="form-card">
+                    <div class="form-card-header">
+                        <i class="fas fa-file-invoice-dollar me-2"></i>
+                        {% if action == 'Add' %}New Expense Request{% else %}Edit Expense Request{% endif %}
+                    </div>
+                    <div class="form-card-body">
+                        <form method="post">
+                            {% csrf_token %}
+                            {% if next_url %}
+                                <input type="hidden" name="next" value="{{ next_url }}" />
+                            {% endif %}
+                            <div class="mb-4">
+                                <label class="form-label fw-500">Department <span class="text-danger">*</span></label>
+                                <select name="department" class="form-select form-select-lg" required>
+                                    <option value="">-- Select Department --</option>
+                                    <option value="OfisiMchungaji" {% if form.department.value == 'Ofisi Ya Mchungaji' %}selected{% endif %}>Ofisi Ya Mchungaji</option>
+                                    <option value="fedha" {% if form.department.value == 'Fedha' %}selected{% endif %}>Fedha</option>
+                                    <option value="elimu" {% if form.department.value == 'Elimu' %}selected{% endif %}>Elimu</option>
+                                    <option value="afya" {% if form.department.value == 'Afya' %}selected{% endif %}>Afya</option>
+                                    <option value="huduma" {% if form.department.value == 'Huduma Binafsi' %}selected{% endif %}>Huduma Binafsi</option>
+                                    <option value="vijana" {% if form.department.value == 'Vijana' %}selected{% endif %}>Vijana</option>
+                                    <option value="wanawake" {% if form.department.value == 'Wana wa kike' %}selected{% endif %}>Wana wa Kike</option>
+                                    <option value="uwakili" {% if form.department.value == 'Uwakili' %}selected{% endif %}>Uwakili</option>
+                                    <option value="majengo" {% if form.department.value == 'Majengo' %}selected{% endif %}>Majengo</option>
+                                    <option value="newstart" {% if form.department.value == 'New Start' %}selected{% endif %}>New Start</option>
+                                    <option value="mawasiliano" {% if form.department.value == 'Mawasiliano' %}selected{% endif %}>Mawasiliano</option>
+                                    <option value="vbs" {% if form.department.value == 'VBS' %}selected{% endif %}>VBS</option>
+                                    <option value="ss" {% if form.department.value == 'SS' %}selected{% endif %}>SS</option>
+                                    <option value="amr" {% if form.department.value == 'AMR' %}selected{% endif %}>AMR</option>
+                                    <option value="muziki" {% if form.department.value == 'Muziki' %}selected{% endif %}>Muziki</option>
+                                    <option value="maombi" {% if form.department.value == 'Maombi' %}selected{% endif %}>Maombi</option>
+                                    <option value="atape" {% if form.department.value == 'Atape' %}selected{% endif %}>Atape</option>
+                                    <option value="familia" {% if form.department.value == 'Familia' %}selected{% endif %}>Huduma za Familia</option>
+                                    <option value="vop" {% if form.department.value == 'VOP' %}selected{% endif %}>VOP</option>
+                                    <option value="nyingineyo" {% if form.department.value == 'Nyingineyo' %}selected{% endif %}>Nyingineyo</option>
+                                    <option value="watoto" {% if form.department.value == 'Watoto' %}selected{% endif %}>Watoto</option>
+                                    <option value="uchapaji" {% if form.department.value == 'Uchapaji' %}selected{% endif %}>Uchapaji</option>
+                                    <option value="mahitaji" {% if form.department.value == 'Mahitaji Maalumu' %}selected{% endif %}>Mahitaji Maalumu</option>
+                                    <option value="amo&dorcas" {% if form.department.value == 'AMO & Dorcas' %}selected{% endif %}>AMO & Dorcas</option>
+                                    <option value="kwaya" {% if form.department.value == 'Kwaya ya Kanisa' %}selected{% endif %}>Kwaya ya Kanisa</option>
+                                    <option value="syc" {% if form.department.value == 'SYC' %}selected{% endif %}>SYC</option>
+                                    <option value="shadow" {% if form.department.value == 'Shadow of Calvary' %}selected{% endif %}>Shadow of Calvary</option>
+                                    <option value="mashemasi" {% if form.department.value == 'Mashemasi' %}selected{% endif %}>Mashemasi</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label fw-500">Category <span class="text-danger">*</span></label>
+                                <input type="text" name="category" class="form-control form-control-lg"
+                                       placeholder="e.g., Usafiri, Chakula kila sabato, Huduma za Afya"
+                                       value="{{ form.category.value|default:'' }}" required>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label fw-500">Amount (TSH) <span class="text-danger">*</span></label>
+                                <div class="input-group input-group-lg">
+                                    <span class="input-group-text fw-600">TSH</span>
+                                    <input type="number" name="amount" class="form-control"
+                                           placeholder="0.00" step="0.01" min="0"
+                                           value="{{ form.amount.value|default:'' }}" required>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label fw-500">Date <span class="text-danger">*</span></label>
+                                <input type="date" name="date" class="form-control form-control-lg"
+                                       value="{{ form.date.value|date:'Y-m-d'|default:'' }}" required>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label fw-500">Description / Justification</label>
+                                <textarea name="description" class="form-control" rows="4"
+                                          placeholder="Provide detailed justification for this expense request...">{{ form.description.value|default:'' }}</textarea>
+                            </div>
+
+                            {% if is_admin_user %}
+                            <div class="mb-4 p-3 bg-light rounded">
+                                <h6 class="fw-600 mb-3"><i class="fas fa-shield-halved me-1 text-primary"></i>Admin: Status Management</h6>
+                                <div class="mb-3">
+                                    <label class="form-label fw-500">Status</label>
+                                    <select name="status" class="form-select">
+                                        <option value="pending" {% if expense.status == 'pending' %}selected{% endif %}>Pending</option>
+                                        <option value="approved" {% if expense.status == 'approved' %}selected{% endif %}>Approved</option>
+                                        <option value="not_approved" {% if expense.status == 'not_approved' %}selected{% endif %}>Not Approved</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="form-label fw-500">Review Notes</label>
+                                    <textarea name="review_notes" class="form-control" rows="2"
+                                              placeholder="Admin review notes...">{{ expense.review_notes|default:'' }}</textarea>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            <div class="d-flex gap-3">
+                                <button type="submit" class="btn btn-primary btn-lg flex-fill">
+                                    <i class="fas fa-save me-2"></i>
+                                    {% if action == 'Add' %}Submit Request{% else %}Update Request{% endif %}
+                                </button>
+                                {% if next_url %}
+                                <a href="{{ next_url }}" class="btn btn-outline-secondary btn-lg">
+                                    <i class="fas fa-times me-1"></i> Cancel
+                                </a>
+                                {% else %}
+                                <a href="{% url 'expenses' %}" class="btn btn-outline-secondary btn-lg">
+                                    <i class="fas fa-times me-1"></i> Cancel
+                                </a>
+                                {% endif %}
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const dateInput = document.querySelector('input[name="date"]');
+if (dateInput && !dateInput.value) {
+    dateInput.value = new Date().toISOString().split('T')[0];
+}
+</script>
+{% endblock %}

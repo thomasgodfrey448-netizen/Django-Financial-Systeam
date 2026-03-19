@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Income Detail{% endblock %}
+
+{% block content %}
+<div class="page-wrapper">
+    <div class="page-header">
+        <div class="container-fluid">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h1 class="page-title"><i class="fas fa-arrow-trend-up me-2"></i>Income Detail</h1>
+                </div>
+                <div class="col-auto d-flex gap-2">
+                    {% if user.is_authenticated %}
+                    <a href="{% url 'income_edit' income.pk %}" class="btn btn-warning">
+                        <i class="fas fa-edit me-1"></i> Edit
+                    </a>
+                    {% endif %}
+                    <a href="{% url 'income' %}" class="btn btn-outline-light">
+                        <i class="fas fa-arrow-left me-1"></i> Back
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid py-4">
+        <div class="row justify-content-center">
+            <div class="col-lg-7">
+                <div class="detail-card">
+                    <div class="detail-card-header income-bg">
+                        <div class="detail-icon"><i class="fas fa-arrow-trend-up"></i></div>
+                        <div>
+                            <h4>{{ income.get_display_name }}</h4>
+                            <p>Income Record #{{ income.pk }}</p>
+                        </div>
+                    </div>
+                    <div class="detail-card-body">
+                        <div class="detail-row">
+                            <span class="detail-label"><i class="fas fa-tag me-2"></i>Source</span>
+                            <span class="detail-value">
+                                <span class="source-badge">{{ income.get_display_name }}</span>
+                            </span>
+                        </div>
+                        <div class="detail-row highlight">
+                            <span class="detail-label"><i class="fas fa-money-bill-wave me-2"></i>Amount</span>
+                            <span class="detail-value amount-large">TSH {{ income.amount|floatformat:2 }}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label"><i class="fas fa-calendar me-2"></i>Date</span>
+                            <span class="detail-value">{{ income.date|date:"F d, Y" }}</span>
+                        </div>
+                        {% if income.department %}
+                        <div class="detail-row">
+                            <span class="detail-label"><i class="fas fa-building me-2"></i>Department</span>
+                            <span class="detail-value">{{ income.get_department_display }}</span>
+                        </div>
+                        {% endif %}
+                        <div class="detail-row">
+                            <span class="detail-label"><i class="fas fa-user me-2"></i>Recorded By</span>
+                            <span class="detail-value">{{ income.created_by.get_full_name|default:income.created_by.username|default:"System" }}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label"><i class="fas fa-clock me-2"></i>Created</span>
+                            <span class="detail-value">{{ income.created_at|date:"F d, Y H:i" }}</span>
+                        </div>
+                        {% if income.updated_at != income.created_at %}
+                        <div class="detail-row">
+                            <span class="detail-label"><i class="fas fa-history me-2"></i>Last Updated</span>
+                            <span class="detail-value">{{ income.updated_at|date:"F d, Y H:i" }}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

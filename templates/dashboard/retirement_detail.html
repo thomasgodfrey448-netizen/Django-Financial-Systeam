@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Retirement Detail{% endblock %}
+
+{% block content %}
+<div class="page-wrapper">
+    <div class="page-header">
+        <div class="container-fluid">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h1 class="page-title"><i class="fas fa-hand-holding-dollar me-2"></i>Retirement Record Detail</h1>
+                </div>
+                <div class="col-auto d-flex gap-2">
+                    {% if user.is_authenticated %}
+                    <a href="{% url 'retirement_edit' retirement.pk %}" class="btn btn-warning">
+                        <i class="fas fa-edit me-1"></i> Edit
+                    </a>
+                    {% endif %}
+                    <a href="{% url 'retirement' %}" class="btn btn-outline-light">
+                        <i class="fas fa-arrow-left me-1"></i> Back
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid py-4">
+        <div class="row justify-content-center">
+            <div class="col-lg-7">
+                <div class="detail-card">
+                    <div class="detail-card-header retirement-bg">
+                        <div class="detail-icon"><i class="fas fa-hand-holding-dollar"></i></div>
+                        <div>
+                            <h4>{{ retirement.category }}</h4>
+                            <p>Retirement Record #{{ retirement.pk }}</p>
+                        </div>
+                    </div>
+                    <div class="detail-card-body">
+                        <div class="detail-row">
+                            <span class="detail-label"><i class="fas fa-building me-2"></i>Department</span>
+                            <span class="detail-value"><span class="dept-badge">{{ retirement.get_department_display }}</span></span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label"><i class="fas fa-tag me-2"></i>Category</span>
+                            <span class="detail-value">{{ retirement.category }}</span>
+                        </div>
+                        <div class="detail-row highlight">
+                            <span class="detail-label"><i class="fas fa-money-bill-wave me-2"></i>Amount</span>
+                            <span class="detail-value amount-large">TSH {{ retirement.amount|floatformat:2 }}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label"><i class="fas fa-calendar me-2"></i>Date</span>
+                            <span class="detail-value">{{ retirement.date|date:"F d, Y" }}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label"><i class="fas fa-info-circle me-2"></i>Status</span>
+                            <span class="detail-value">
+                                <span class="status-badge status-ret-{{ retirement.status }}">
+                                    {% if retirement.status == 'closed' %}
+                                        <i class="fas fa-folder-closed me-1"></i>Closed
+                                    {% else %}
+                                        <i class="fas fa-folder-open me-1"></i>Open
+                                    {% endif %}
+                                </span>
+                            </span>
+                        </div>
+                        {% if retirement.description %}
+                        <div class="detail-row">
+                            <span class="detail-label"><i class="fas fa-align-left me-2"></i>Description</span>
+                            <span class="detail-value">{{ retirement.description }}</span>
+                        </div>
+                        {% endif %}
+                        {% if retirement.notes %}
+                        <div class="detail-row">
+                            <span class="detail-label"><i class="fas fa-sticky-note me-2"></i>Notes</span>
+                            <span class="detail-value">{{ retirement.notes }}</span>
+                        </div>
+                        {% endif %}
+                        <div class="detail-row">
+                            <span class="detail-label"><i class="fas fa-user me-2"></i>Submitted By</span>
+                            <span class="detail-value">{{ retirement.submitted_by.get_full_name|default:retirement.submitted_by.username|default:"System" }}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label"><i class="fas fa-clock me-2"></i>Created</span>
+                            <span class="detail-value">{{ retirement.created_at|date:"F d, Y H:i" }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
