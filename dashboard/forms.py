@@ -153,9 +153,20 @@ class DateRangeForm(forms.Form):
 
 
 class DefaultDateRangeForm(forms.ModelForm):
+    from_date = forms.DateField(
+        required=False,
+        widget=forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+        label='From Date'
+    )
+    to_date = forms.DateField(
+        required=False,
+        widget=forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+        label='To Date'
+    )
+
     class Meta:
         model = DefaultDateRange
-        fields = ['name', 'days_back', 'is_active']
+        fields = ['name', 'days_back', 'from_date', 'to_date', 'is_active']
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control'}),
             'days_back': forms.NumberInput(attrs={'class': 'form-control', 'min': 1, 'max': 365}),

@@ -46,6 +46,18 @@
                                 </div>
                                 <div class="form-text">Common: 7 (week), 14 (two weeks), 30 (month), 90 (quarter)</div>
                             </div>
+                            <div class="mb-4">
+                                <label class="form-label fw-500">Or select a specific date range</label>
+                                <div class="row g-2">
+                                    <div class="col">
+                                        <input type="date" name="from_date" class="form-control" value="{{ form.from_date.value|default:'' }}" placeholder="From">
+                                    </div>
+                                    <div class="col">
+                                        <input type="date" name="to_date" class="form-control" value="{{ form.to_date.value|default:'' }}" placeholder="To">
+                                    </div>
+                                </div>
+                                <div class="form-text">If set, this will override the days back setting.</div>
+                            </div>
                             <div class="mb-4 form-check">
                                 <input type="checkbox" name="is_active" class="form-check-input" id="isActive"
                                        {% if form.is_active.value != False %}checked{% endif %}>

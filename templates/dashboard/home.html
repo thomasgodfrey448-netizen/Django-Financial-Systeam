@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load humanize %}
 
 {% block title %}Home Dashboard{% endblock %}
 
@@ -20,6 +21,8 @@
                 </div>
             </div>
         </div>
+
+        <!-- Summary Tables Section (moved below cards) -->
     </div>
 
     <!-- Date Filter Panel -->
@@ -106,7 +109,95 @@
             </div>
         </div>
 
-        <div class="row g-4">
+        <!-- Summary Tables Section -->
+        <div class="row g-4 mb-4">
+            <div class="col-12 col-lg-4">
+                <div class="content-card h-100">
+                    <div class="content-card-header text-start">
+                        <span class="fw-600">Matoleo</span>
+                    </div>
+                    <div class="content-card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-sm table-striped mb-0">
+                                <thead>
+                                    <tr><th>Matoleo</th><th>Kiasi</th></tr>
+                                </thead>
+                                <tbody>
+                                    {% for i in income_shortlist %}
+                                    <tr>
+                                        <td>{{ i.get_display_name }}</td>
+                                        <td class="text-end">{{ i.amount|floatformat:2|intcomma }}</td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr><td colspan="2" class="text-center text-muted">No records</td></tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-lg-4">
+                <div class="content-card h-100">
+                    <div class="content-card-header text-start">
+                        <span class="fw-600">Maombi ya Fedha</span>
+                    </div>
+                    <div class="content-card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-sm table-striped mb-0">
+                                <thead>
+                                    <tr><th>Idara</th><th>Kwa Ajili Ya</th><th>Kiasi</th></tr>
+                                </thead>
+                                <tbody>
+                                    {% for e in expense_shortlist %}
+                                    <tr class="expandable-row" data-bs-toggle="collapse" data-bs-target="#expdesc{{ e.id }}" aria-expanded="false" style="cursor:pointer;">
+                                        <td>{{ e.get_department_display }}</td>
+                                        <td>{{ e.category }}</td>
+                                        <td class="text-end">{{ e.amount|floatformat:2|intcomma }}</td>
+                                    </tr>
+                                    <tr id="expdesc{{ e.id }}" class="collapse bg-light">
+                                        <td colspan="3" class="small text-muted">{{ e.description|default:'-' }}</td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr><td colspan="3" class="text-center text-muted">No records</td></tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-lg-4">
+                <div class="content-card h-100">
+                    <div class="content-card-header text-start">
+                        <span class="fw-600">Marejesho</span>
+                    </div>
+                    <div class="content-card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-sm table-striped mb-0">
+                                <thead>
+                                    <tr><th>Idara</th><th>Kwa Ajili Ya</th><th>Kiasi</th></tr>
+                                </thead>
+                                <tbody>
+                                    {% for r in retirement_shortlist %}
+                                    <tr class="expandable-row" data-bs-toggle="collapse" data-bs-target="#retdesc{{ r.id }}" aria-expanded="false" style="cursor:pointer;">
+                                        <td>{{ r.get_department_display }}</td>
+                                        <td>{{ r.category }}</td>
+                                        <td class="text-end">{{ r.amount|floatformat:2|intcomma }}</td>
+                                    </tr>
+                                    <tr id="retdesc{{ r.id }}" class="collapse bg-light">
+                                        <td colspan="3" class="small text-muted">{{ r.description|default:'-' }}</td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr><td colspan="3" class="text-center text-muted">No records</td></tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
             <!-- Announcements -->
             <div class="col-lg-6">
                 <div class="content-card">

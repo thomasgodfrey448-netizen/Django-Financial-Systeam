@@ -29,6 +29,8 @@ def format_tsh(value):
 def get_default_date_range():
     try:
         default_range = DefaultDateRange.objects.filter(is_active=True).first()
+        if default_range and default_range.from_date and default_range.to_date:
+            return default_range.from_date, default_range.to_date
         days = default_range.days_back if default_range else 14
     except Exception:
         days = 14
@@ -179,6 +181,11 @@ def home_view(request):
     expense_qs = ExpenseRequest.objects.filter(date__gte=date_from, date__lte=date_to)
     retirement_qs = Retirement.objects.filter(date__gte=date_from, date__lte=date_to)
 
+    # Short lists for home summary tables
+    income_shortlist = income_qs.order_by('-date', '-created_at')[:5]
+    expense_shortlist = expense_qs.order_by('-date', '-created_at')[:5]
+    retirement_shortlist = retirement_qs.order_by('-date', '-created_at')[:5]
+
     total_income = income_qs.aggregate(total=Sum('amount'))['total'] or 0
     total_expenses = expense_qs.aggregate(total=Sum('amount'))['total'] or 0
     total_retirement = retirement_qs.aggregate(total=Sum('amount'))['total'] or 0
@@ -210,6 +217,9 @@ def home_view(request):
         'default_from': default_from,
         'default_to': default_to,
         'active_tab': 'home',
+        'income_shortlist': income_shortlist,
+        'expense_shortlist': expense_shortlist,
+        'retirement_shortlist': retirement_shortlist,
     }
     return render(request, 'dashboard/home.html', context)
 
@@ -658,6 +668,17 @@ def admin_set_default_range(request):
         messages.error(request, 'Access denied.')
         return redirect('home')
     default_range = DefaultDateRange.objects.filter(is_active=True).first()
+    if request.method == 'POST':
+        form = DefaultDateRangeForm(request.POST, instance=default_range)
+        if form.is_valid():
+            obj = form.save(commit=False)
+            obj.updated_by = request.user
+            obj.save()
+            messages.success(request, f'Default date range set to last {obj.days_back} days.')
+            return redirect('admin_dashboard')
+    else:
+        form = DefaultDateRangeForm(instance=default_range)
+    return render(request, 'dashboard/default_range_form.html', {'form': form})
 
 
 @login_required
@@ -670,17 +691,6 @@ def admin_comment_delete(request, pk):
         comment.delete()
         messages.success(request, 'Comment deleted.')
     return redirect('admin_dashboard')
-    if request.method == 'POST':
-        form = DefaultDateRangeForm(request.POST, instance=default_range)
-        if form.is_valid():
-            obj = form.save(commit=False)
-            obj.updated_by = request.user
-            obj.save()
-            messages.success(request, f'Default date range set to last {obj.days_back} days.')
-            return redirect('admin_dashboard')
-    else:
-        form = DefaultDateRangeForm(instance=default_range)
-    return render(request, 'dashboard/default_range_form.html', {'form': form})
 
 
 @login_required

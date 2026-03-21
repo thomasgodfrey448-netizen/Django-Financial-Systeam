@@ -7,8 +7,8 @@ from django.utils import timezone
 
 DEPARTMENT_CHOICES = [
     ('OfisiMchungaji', 'Ofisi Ya Mchungaji'),
-    ('fedha', 'Finance'),
-    ('elimu', 'Education'),
+    ('fedha', 'Fedha'),
+    ('elimu', 'Elimu'),
     ('afya', 'Afya'),
     ('huduma', 'Huduma Binafsi'),
     ('vijana', 'Vijana'),
@@ -105,7 +105,7 @@ class Comment(models.Model):
 class Income(models.Model):
     source = models.CharField(max_length=20, choices=INCOME_SOURCE_CHOICES, default='other')
     source_name = models.CharField(max_length=200, blank=True, help_text="Custom source name for 'Other' income")
-    amount = models.DecimalField(max_digits=15, decimal_places=2)
+    amount = models.DecimalField(max_digits=20, decimal_places=2)
     date = models.DateField(default=timezone.now)
     description = models.TextField(blank=True)
     department = models.CharField(max_length=50, choices=DEPARTMENT_CHOICES, blank=True)
@@ -128,7 +128,7 @@ class Income(models.Model):
 class ExpenseRequest(models.Model):
     department = models.CharField(max_length=50, choices=DEPARTMENT_CHOICES)
     category = models.CharField(max_length=200)
-    amount = models.DecimalField(max_digits=15, decimal_places=2)
+    amount = models.DecimalField(max_digits=20, decimal_places=2)
     description = models.TextField(blank=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES_EXPENSE, default='pending')
     requested_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='expense_requests')
@@ -148,7 +148,7 @@ class ExpenseRequest(models.Model):
 class Retirement(models.Model):
     department = models.CharField(max_length=50, choices=DEPARTMENT_CHOICES)
     category = models.CharField(max_length=200)
-    amount = models.DecimalField(max_digits=15, decimal_places=2)
+    amount = models.DecimalField(max_digits=20, decimal_places=2)
     description = models.TextField(blank=True)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES_RETIREMENT, default='open')
     submitted_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='retirements')
@@ -168,6 +168,8 @@ class DefaultDateRange(models.Model):
     """Admin-configurable default date range shown on dashboard."""
     name = models.CharField(max_length=100, default='Default Range')
     days_back = models.IntegerField(default=14, help_text='Number of days back from today (e.g., 7 for last 7 days)')
+    from_date = models.DateField(null=True, blank=True, help_text='Optional: Start date for a fixed range')
+    to_date = models.DateField(null=True, blank=True, help_text='Optional: End date for a fixed range')
     is_active = models.BooleanField(default=True)
     updated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -182,7 +184,7 @@ class DefaultDateRange(models.Model):
 class NetBalance(models.Model):
     """Manual net balance value set by admin."""
 
-    amount = models.DecimalField(max_digits=15, decimal_places=2, default=0)
+    amount = models.DecimalField(max_digits=20, decimal_places=2, default=0)
     updated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True)
 
