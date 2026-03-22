@@ -182,9 +182,9 @@ def home_view(request):
     retirement_qs = Retirement.objects.filter(date__gte=date_from, date__lte=date_to)
 
     # Short lists for home summary tables
-    income_shortlist = income_qs.order_by('-date', '-created_at')[:5]
-    expense_shortlist = expense_qs.order_by('-date', '-created_at')[:5]
-    retirement_shortlist = retirement_qs.order_by('-date', '-created_at')[:5]
+    income_shortlist = income_qs.order_by('-date', '-created_at')[:15]
+    expense_shortlist = expense_qs.order_by('-date', '-created_at')[:15]
+    retirement_shortlist = retirement_qs.order_by('-date', '-created_at')[:15]
 
     total_income = income_qs.aggregate(total=Sum('amount'))['total'] or 0
     total_expenses = expense_qs.aggregate(total=Sum('amount'))['total'] or 0
