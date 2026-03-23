@@ -13,16 +13,13 @@
                     <p class="page-subtitle">Period: <strong>{{ date_from|date:"M d, Y" }}</strong> to <strong>{{ date_to|date:"M d, Y" }}</strong></p>
                 </div>
                 <div class="col-auto d-flex gap-2">
-                    <button class="btn btn-filter-toggle" data-bs-toggle="collapse" data-bs-target="#filterPanel">
-                        <i class="fas fa-filter me-1"></i> Filter
-                    </button>
                     {% if user.is_authenticated %}
                     <a href="{% url 'retirement_add' %}" class="btn btn-add-main">
                         <i class="fas fa-plus me-1"></i> Add Record
                     </a>
                     {% else %}
                     <a href="{% url 'login' %}" class="btn btn-add-main">
-                        <i class="fas fa-lock me-1"></i> Login to Add
+                        <i class="fas fa-lock me-1"></i>
                     </a>
                     {% endif %}
                 </div>
@@ -196,7 +193,7 @@
                                 <td colspan="{% if user.is_authenticated and user.profile.role != 'customer' %}7{% else %}6{% endif %}" class="details-cell">
                                     <div class="details-content">
                                         <strong>Mchanganuo:</strong>
-                                        <span>{{ retirement.description|default:"(Hakuna Mchanganuo)" }}</span>
+                                        <span style="white-space: pre-line;">{{ retirement.description|default:"(Hakuna Mchanganuo)" }}</span>
                                     </div>
                                 </td>
                             </tr>
@@ -259,4 +256,12 @@ document.querySelectorAll('.table-row-clickable').forEach(row => {
     });
 });
 </script>
+<style>
+/* Make "Kiasi" column bigger in income table */
+.data-table .amount-cell {
+    font-size: 0.75rem;  /* adjust number to make it bigger or smaller */
+    font-weight: bold;
+    font-weight: 650;   /* optional: make it bolder */
+}
+</style>
 {% endblock %}

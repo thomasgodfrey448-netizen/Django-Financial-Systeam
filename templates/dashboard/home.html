@@ -14,11 +14,6 @@
                     <h1 class="page-title"><i class="fas fa-home me-2"></i>Taarifa ya Fedha wiki Hii</h1>
                     <p class="page-subtitle">Summary for <strong>{{ date_from|date:"M d, Y" }}</strong> to <strong>{{ date_to|date:"M d, Y" }}</strong></p>
                 </div>
-                <div class="col-auto">
-                    <button class="btn btn-filter-toggle" data-bs-toggle="collapse" data-bs-target="#filterPanel">
-                        <i class="fas fa-filter me-1"></i> Filter Dates
-                    </button>
-                </div>
             </div>
         </div>
 
@@ -114,13 +109,13 @@
             <div class="col-12 col-lg-4">
                 <div class="content-card h-100">
                     <div class="content-card-header text-start">
-                        <span class="fw-600">Matoleo</span>
+                        <h5 class="mb-0">Matoleo</h5>
                     </div>
                     <div class="content-card-body p-0">
                         <div class="table-responsive">
                             <table class="table table-sm table-striped mb-0">
-                                <thead>
-                                    <tr><th>Matoleo</th><th>Kiasi</th></tr>
+                                <thead class="table-header-blue">
+                                    <tr><th>Matoleo</th><th class="text-end">Kiasi</th></tr>
                                 </thead>
                                 <tbody>
                                     {% for i in income_shortlist %}
@@ -140,13 +135,13 @@
             <div class="col-12 col-lg-4">
                 <div class="content-card h-100">
                     <div class="content-card-header text-start">
-                        <span class="fw-600">Maombi ya Fedha</span>
+                        <h5 class="mb-0">Maombi ya Fedha</h5>
                     </div>
                     <div class="content-card-body p-0">
                         <div class="table-responsive">
                             <table class="table table-sm table-striped mb-0">
                                 <thead>
-                                    <tr><th>Idara</th><th>Kwa Ajili Ya</th><th>Kiasi</th></tr>
+                                    <tr><th>Idara</th><th>Kwa ajili ya</th><th class="text-end">Kiasi</th></tr>
                                 </thead>
                                 <tbody>
                                     {% for e in expense_shortlist %}
@@ -156,7 +151,7 @@
                                         <td class="text-end">{{ e.amount|floatformat:2|intcomma }}</td>
                                     </tr>
                                     <tr id="expdesc{{ e.id }}" class="collapse bg-light">
-                                        <td colspan="3" class="small text-muted">{{ e.description|default:'-' }}</td>
+                                        <td colspan="3" class="small text-muted" style="white-space: pre-line;">{{ e.description|default:'-' }}</td>
                                     </tr>
                                     {% empty %}
                                     <tr><td colspan="3" class="text-center text-muted">No records</td></tr>
@@ -170,13 +165,13 @@
             <div class="col-12 col-lg-4">
                 <div class="content-card h-100">
                     <div class="content-card-header text-start">
-                        <span class="fw-600">Marejesho</span>
+                        <h5 class="mb-0">Marejesho</h5>
                     </div>
                     <div class="content-card-body p-0">
                         <div class="table-responsive">
                             <table class="table table-sm table-striped mb-0">
                                 <thead>
-                                    <tr><th>Idara</th><th>Kwa Ajili Ya</th><th>Kiasi</th></tr>
+                                    <tr><th>Idara</th><th>Kwa ajili ya</th><th class="text-end">Kiasi</th></tr>
                                 </thead>
                                 <tbody>
                                     {% for r in retirement_shortlist %}
@@ -186,7 +181,7 @@
                                         <td class="text-end">{{ r.amount|floatformat:2|intcomma }}</td>
                                     </tr>
                                     <tr id="retdesc{{ r.id }}" class="collapse bg-light">
-                                        <td colspan="3" class="small text-muted">{{ r.description|default:'-' }}</td>
+                                        <td colspan="3" class="small text-muted" style="white-space: pre-line;">{{ r.description|default:'-' }}</td>
                                     </tr>
                                     {% empty %}
                                     <tr><td colspan="3" class="text-center text-muted">No records</td></tr>
@@ -248,7 +243,7 @@
             <div class="col-lg-6">
                 <div class="content-card">
                     <div class="content-card-header">
-                        <h5><i class="fas fa-comments me-2"></i>Maoni na Ushauri</h5>
+                        <h5><i class="fas fa-comments me-2"></i>Maoni & Ushauri</h5>
                         <span class="badge-count">{{ comments|length }}</span>
                     </div>
                     <div class="content-card-body">

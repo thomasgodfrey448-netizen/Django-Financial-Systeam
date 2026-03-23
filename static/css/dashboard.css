@@ -628,7 +628,7 @@ body {
 .amount-cell {
     font-family: 'Courier New', monospace;
     font-weight: 600;
-    font-size: 28px !important; /* force bigger font */
+    font-size: 18px !important; /* force bigger font */
     color: var(--primary);
     white-space: nowrap;
 }
@@ -1397,3 +1397,7 @@ body {
     }
 }
 
+.table-header-blue {
+    background-color: #0d6efd;
+    color: white;
+}
